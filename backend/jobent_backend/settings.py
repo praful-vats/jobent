@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -144,3 +144,31 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
+
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+PINECONE_API_KEY = 'pcsk_DigCf_K19DeFaAr4MxYpebqg6qd2YjkvT3GJidqYmXL7QgVT5f7L2V6cjd846Ykhs3F92'
+PINECONE_INDEX_NAME = 'job3'
+GROQ_API_KEY = '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'
+PINECONE_ENVIRONMENT = 'us-east-1'

@@ -26,7 +26,7 @@ const LandingPage = () => {
             </div>
             
             {/* Title */}
-            <h1 className="title">Jobent:</h1>
+            <h1 className="title">Joƃent:</h1>
             
             {/* Cards Section */}
             <div className="cards-container">
@@ -34,7 +34,7 @@ const LandingPage = () => {
                     <div className="icon">⊖</div>
                     <h2>Resume-focused</h2>
                     <p>
-                        By leveraging AI service leverage efficient job search and effective job application process solutions.
+                        By leveraging AI✺ service leverage efficient job search and effective job application process solutions.
                     </p>
                 </div>
 
@@ -47,7 +47,7 @@ const LandingPage = () => {
                 </div>
 
                 <div className="card">
-                    <div className="icon">X</div>
+                    <div className="icon">x</div>
                     <h2>Premium-factor</h2>
                     <p>
                         Premium features lets you stay ahead with tailored resume, cover letter and unlimited search.

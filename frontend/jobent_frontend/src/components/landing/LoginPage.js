@@ -1,19 +1,30 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import './LoginPage.css';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:8000/api/login/', {
-        username: email,
-        password: password,
+        email: formData.email, // Fix: Use 'email' instead of 'username'
+        password: formData.password,
       });
       localStorage.setItem('token', response.data.token);
       navigate('/service');
@@ -21,34 +32,33 @@ const LoginPage = () => {
       setError('Invalid credentials');
     }
   };
+  
 
   return (
-    <div>
-      <h1>Login</h1>
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Email:</label>
+    <div className='con'>
+      <h1 className="signup-title">LOGIN</h1>
+      <div className="signup-container">
+        <form onSubmit={handleLogin} className="signup-form">
           <input
             type="email"
             name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            placeholder="EMAIL ADDRESS"
+            value={formData.email}
+            onChange={handleChange}
             required
           />
-        </div>
-        <div>
-          <label>Password:</label>
           <input
             type="password"
             name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            placeholder="PASSWORD"
+            value={formData.password}
+            onChange={handleChange}
             required
           />
-        </div>
-        {error && <p>{error}</p>}
-        <button type="submit">Login</button>
-      </form>
+          {error && <p className="error-message">{error}</p>}
+          <button type="submit" className="continue-button">CONTINUE</button>
+        </form>
+      </div>
     </div>
   );
 };

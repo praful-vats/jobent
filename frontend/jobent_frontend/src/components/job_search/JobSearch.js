@@ -7,7 +7,7 @@ const JobSearch = () => {
   const handleJobSearch = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:8000/resume/search_jobs/', {}, {
+      const response = await axios.post('http://localhost:8000/resume/match-jobs/', {}, {
         headers: {
           'Authorization': `Token ${token}`,
         },

@@ -12,11 +12,9 @@ class Resume(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  # Save the file first
         if self.file:
-            self.file_name = self.file.name
-            self.content = self.extract_text_from_file()
-        super().save(*args, **kwargs)  # Save again to update the content
+            self.file_name = self.file.name.split('/')[-1]  
+        super().save(*args, **kwargs)  
 
     def extract_text_from_file(self):
         # Extract text content from the file
@@ -36,5 +34,5 @@ class Resume(models.Model):
                 text += page.extract_text()
             return text
 
-    def __str__(self):
-        return f"{self.user.username} - {self.file.name}"
+    # def __str__(self):
+    #     return f"{self.user.username} - {self.file.name}"

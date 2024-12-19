@@ -36,7 +36,7 @@ const ResumeList = () => {
       });
       setRewrittenResumes((prev) => ({
         ...prev,
-        [resumeId]: response.data.rewritten_resume,
+        [resumeId]: response.data.file_url, // Store the URL to the PDF file
       }));
       console.log('Resume rewritten:', response.data);
     } catch (error) {
@@ -49,30 +49,36 @@ const ResumeList = () => {
       <h1>Resume List</h1>
       <ul>
         {resumes.length > 0 ? (
-          resumes.map((resume) => (
-            <li key={resume.id}>
-              <h2>{resume.name}</h2>
-              <p>File: {resume.file_name}</p>
-              <p>{resume.content}</p>
-              {/* Job description input */}
-              <textarea
-                placeholder="Enter Job Description"
-                onChange={(e) => setJobDescription(e.target.value)}
-                style={{ width: "100%", height: "80px", marginBottom: "10px" }}
-              />
-              {/* Rewrite Resume button */}
-              <button onClick={() => handleRewrite(resume.id)}>
-                Rewrite Resume
-              </button>
-              {/* Display rewritten resume */}
-              {rewrittenResumes[resume.id] && (
-                <div>
-                  <h3>Rewritten Resume</h3>
-                  <p>{rewrittenResumes[resume.id]}</p>
-                </div>
-              )}
-            </li>
-          ))
+          resumes.map((resume) => {
+            return (
+              <li key={resume.id}>
+                <p>File: {resume.file_name}</p>
+                <p>{resume.content}</p>
+                {/* Job description input */}
+                <textarea
+                  placeholder="Enter Job Description"
+                  onChange={(e) => setJobDescription(e.target.value)}
+                  style={{ width: "100%", height: "80px", marginBottom: "10px" }}
+                />
+                {/* Rewrite Resume button */}
+                <button onClick={() => handleRewrite(resume.id)}>
+                  Rewrite Resume
+                </button>
+                {/* Display rewritten resume PDF */}
+                {rewrittenResumes[resume.id] && (
+                  <div>
+                    <h3>Rewritten Resume</h3>
+                    <iframe 
+                      src={rewrittenResumes[resume.id]} 
+                      width="100%" 
+                      height="500px" 
+                      title="Rewritten Resume"
+                    />
+                  </div>
+                )}
+              </li>
+            );
+          })
         ) : (
           <p>No resumes found. Upload one to get started!</p>
         )}
