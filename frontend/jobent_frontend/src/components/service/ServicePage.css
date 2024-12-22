@@ -1,0 +1,222 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #000000;
+    color: #000;
+  }
+  
+  .service-page {
+    text-align: center;
+  }
+  
+  .service-page .nav {
+    margin-bottom: 40px;
+  }
+  
+  .service-page header h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+  }
+  
+.service-page .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* margin: 0 auto; */
+    width: 100%; 
+    height: 35vh;
+    z-index: 1000;
+    position: fixed;
+    bottom: 200px;
+}
+  
+  .service-page .grid2 {
+    position: fixed;
+    bottom: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%; 
+    height: 35vh; 
+    z-index: 1000;
+    background-color: #000000;
+  }
+  
+  .service-page .card,
+  .service-page .card2 {
+    background: #cbcbcb;
+    border: 1px solid #000000;
+    padding: 2rem;
+    text-align: center;
+    min-width: 25vw;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  }
+  
+  .service-page .card:hover,
+  .service-page .card2:hover {
+    transform: translateY(-5px);
+    background-color: #fbf4f4;
+  }
+  
+  .card {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    font-family: 'Arial', sans-serif;
+    max-height: 200px;
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .card-header1 {
+    margin-left: -10px;
+    margin-top: -10px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .card-header2 {
+    /* margin-left: 20px; */
+    margin-top: -27px;
+  }
+  
+  .card-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .card-header .arrow {
+    font-size: 18px;
+    margin: 0;
+  }
+  
+  .card-body {
+    display: grid;
+    justify-items: left;
+    text-align: left;
+    /* margin-top: 20px; */
+    font-size: 30px;
+    margin-left: -20px;
+  }
+  
+  .card-body-icon {
+    font-size: 48px;
+    margin-top: -5px;
+    margin-bottom: -10px;
+    margin-left: 8px;
+    font-weight: 900;
+    display: inline-block;
+    transform: scaleX(-1);
+  }
+  
+  .card-body-text {
+    font-size: 10px;
+    margin-top: 20px;
+    margin-left: 10px;
+  }
+  
+  .service-page .card h2,
+  .service-page .card2 h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  .service-page .card p,
+  .service-page .card2 p {
+    /* font-size: 1rem; */
+    color: black;
+  }
+  
+  .service-page .popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .service-page .popup-content {
+    background: #cbcbcb;
+    padding: 20px;
+    /* border-radius: 8px; */
+    width: 80%;
+    max-width: 600px;
+    min-height: 400px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  .service-page .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    /* background: #ff5e5e; */
+    border: none;
+    /* color: #fff; */
+    font-size: 16px;
+    padding: 5px 10px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .service-page .close-button:hover {
+    background: #e04e4e;
+  }
+  
+  .grid3 {
+    position: fixed;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    /* padding: 1rem 2rem; */
+    border-bottom: 1px solid #000000;
+    justify-content: space-between;
+    background-color: #cbcbcb;
+  }
+  
+  .card3 {
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 30px;
+  }
+  
+  .card3 p {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0;
+  }
+  
+  .card4 {
+    background: none;
+    border: none;
+    padding: 0;
+    margin-right: 30px;
+  }
+
+  .card5
+  {
+    margin-left: 1100px;
+  }
+  
+  .card4 p {
+    font-size: 30px;
+    font-weight: 500;
+    margin-right: 40px;
+    line-height: 0; 
+  }
+  
+  * {
+    box-sizing: border-box;
+  }

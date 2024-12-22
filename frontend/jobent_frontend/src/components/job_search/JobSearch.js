@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const JobSearch = () => {
+const JobSearch = ({ onJobSearchResults }) => {
   const [matchedJobs, setMatchedJobs] = useState([]);
 
   const handleJobSearch = async () => {
@@ -13,6 +13,9 @@ const JobSearch = () => {
         },
       });
       setMatchedJobs(response.data.matched_jobs);
+      if (onJobSearchResults) {
+        onJobSearchResults(response.data.matched_jobs); // Pass results up
+      }
     } catch (error) {
       console.error('Error searching for jobs:', error);
     }

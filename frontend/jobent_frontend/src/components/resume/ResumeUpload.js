@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const ResumeUpload = () => {
+const ResumeUpload = ({ onUploadSuccess }) => { 
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
 
@@ -16,7 +16,14 @@ const ResumeUpload = () => {
 
     try {
       const token = localStorage.getItem('token');
-      console.log("Token:", token);
+      // console.log("Token:", token);
+
+      // const response = await axios.post('http://localhost:8000/resume/upload/', formData, {
+      //   headers: {
+      //     'Content-Type': 'multipart/form-data',
+      //     'Authorization': `Token ${token}`,
+      //   },
+      // });
 
       const response = await axios.post('http://localhost:8000/resume/upload/', formData, {
         headers: {
@@ -26,6 +33,8 @@ const ResumeUpload = () => {
       });
       setMessage('File uploaded successfully');
       console.log('File uploaded:', response.data);
+      onUploadSuccess();
+      
     } catch (error) {
       setMessage('Error uploading file');
       console.error('Error uploading file:', error);
@@ -37,7 +46,7 @@ const ResumeUpload = () => {
       <h1>Upload Resume</h1>
       <form onSubmit={handleUpload}>
         <input type="file" onChange={handleFileChange} />
-        <button type="submit">Upload</button>
+        <button type="submit">Find Matching Jobs</button>
       </form>
       {message && <p>{message}</p>}
     </div>

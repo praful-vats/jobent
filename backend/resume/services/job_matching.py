@@ -1,54 +1,227 @@
-from sentence_transformers import SentenceTransformer
+from pinecone import Pinecone
+from sentence_transformers import SentenceTransformer, util
+import json
+from bs4 import BeautifulSoup
+from scrapfly import ScrapflyClient, ScrapeConfig
 
-# Initialize Hugging Face model
-model = SentenceTransformer('all-MiniLM-L6-v2')
+# Initialize Pinecone with your existing API key
+pinecone_client = Pinecone(api_key='pcsk_qNsFT_HBcHa6jEqRq1YUzLbmSgNoZV8AfyrHmkK5dbKY9kXVLMtRQJCoHnQWrmdTLqf8s')
 
-# Function to truncate text if it's too long
-def truncate_text(text, max_length=3000):
-    return text[:max_length]
+# Get the existing index (since it's already created)
+index_name = "jobent"
+index = pinecone_client.Index(index_name)
 
-def rewrite_resume(original_resume, job_description):
-    """
-    Rewrites the resume according to the provided job description.
-    """
-    structured_resume = f"""
-    Summary:
-    {original_resume['summary']}
+# Initialize Scrapfly client
+SCRAPFLY_KEY = "scp-live-a7dc0dee17c24110a73d5d8cc82c7226"
+client = ScrapflyClient(key=SCRAPFLY_KEY)
 
-    Skills:
-    {original_resume['skills']}
+# Initialize embedding model
+model = SentenceTransformer("all-MiniLM-L6-v2")
 
-    Experience:
-    {original_resume['experience']}
+# def extract_apollo_state(scrape_result):
+#     try:
+#         # Parse the HTML content
+#         soup = BeautifulSoup(scrape_result.content, "html.parser")
 
-    Education:
-    {original_resume['education']}
+#         # Find the Apollo state
+#         script_tag = soup.find("script", {"id": "__NEXT_DATA__"})
+#         if not script_tag:
+#             return {"error": "Apollo state not found in the page."}
 
-    Projects:
-    {original_resume['projects']}
-    """
+#         # Load JSON data
+#         apollo_state = json.loads(script_tag.string)
 
-    truncated_resume = truncate_text(structured_resume, max_length=3000)
-    rewritten_resume = f"""
-    Rewrite the following resume to fit the provided job description. Focus solely on the resume content, ensuring it aligns with the job description.
-    Resume:
-    {truncated_resume}
-    Job Description:
-    {job_description}
-    """
-    return rewritten_resume
+#         # Debugging: print the entire Apollo state to understand its structure
+#         # print(json.dumps(apollo_state, indent=2))
 
-def embed_text_with_model(text):
-    """
-    Generates embeddings for the resume using a Hugging Face model.
-    """
-    if not isinstance(text, str) or not text.strip():  # Ensure it's a valid non-empty string
-        print(f"Error: Invalid text input. Received: {text}")
-        return None
+#         # Extract jobs from the Apollo state
+#         jobs = []
 
+#         # Loop over the "apolloState" and look for highlightedJobListings
+#         apollo_data = apollo_state.get("props", {}).get("pageProps", {}).get("apolloState", {})
+#         for key, value in apollo_data.items():
+#             # Check if the current key is a job listing reference (JobListingSearchResult)
+#             if key.startswith("JobListingSearchResult:"):
+#                 job_details = value
+
+#                 # Create the job dictionary with the relevant details
+#                 job = {
+#                     "title": job_details.get("title", ""),
+#                     "company": job_details.get("company", {}).get("name", ""),
+#                     "description": job_details.get("description", ""),
+#                     "location": job_details.get("locationNames", [])[0] if job_details.get("locationNames") else "",
+#                     "url": f"https://wellfound.com/job/{job_details.get('slug', '')}",
+#                     "jobType": job_details.get("jobType", ""),
+#                     "compensation": job_details.get("compensation", ""),
+#                     "yearsExperienceMin": job_details.get("yearsExperienceMin", ""),
+#                     "yearsExperienceMax": job_details.get("yearsExperienceMax", ""),
+#                 }
+#                 jobs.append(job)
+#                 print(f"Job found: {job}")
+
+
+#         return jobs if jobs else {"error": "No jobs found in Apollo state."}
+#     except Exception as e:
+#         return {"error": f"Failed to extract jobs: {str(e)}"}
+
+
+# def scrape_jobs(role="", location=""):
+#     if role and location:
+#         url = f"https://wellfound.com/role/l/{role}/{location}"
+#     elif role:
+#         url = f"https://wellfound.com/role/{role}"
+#     elif location:
+#         url = f"https://wellfound.com/location/{location}"
+#     else:
+#         raise ValueError("Either role or location must be provided.")
+    
+#     try:
+#         result = client.scrape(ScrapeConfig(url=url, asp=True))
+#         job_data = extract_apollo_state(result)
+#         return job_data
+#     except Exception as e:
+#         return {"error": f"Scraping failed: {str(e)}"}
+
+# def match_jobs_with_resume(resume_content, role="python-developer", location="san-francisco"):
+#     try:
+#         # Scrape jobs
+#         jobs = scrape_jobs(role, location)
+#         if "error" in jobs:
+#             return jobs
+
+#         # Embed the resume
+#         resume_embedding = model.encode(resume_content)
+
+#         # Embed job descriptions and find matches
+#         job_matches = []
+#         for job in jobs:
+#             job_description = job.get("description", "")
+#             job_embedding = model.encode(job_description)
+
+#             # Compute similarity
+#             similarity = util.cos_sim(resume_embedding, job_embedding).item()
+#             job["similarity"] = similarity
+#             job_matches.append(job)
+
+#         # Sort by similarity score
+#         job_matches.sort(key=lambda x: x["similarity"], reverse=True)
+
+#         return job_matches[:10]
+#     except Exception as e:
+#         return {"error": f"Matching failed: {str(e)}"}
+
+
+def extract_apollo_state(scrape_result):
     try:
-        embedding = model.encode(text).tolist()  # Hugging Face encoding
-        return embedding
+        # Parse the HTML content
+        soup = BeautifulSoup(scrape_result.content, "html.parser")
+
+        # Find the Apollo state
+        script_tag = soup.find("script", {"id": "__NEXT_DATA__"})
+        if not script_tag:
+            # print("Apollo state not found in the page.")
+            return {"error": "Apollo state not found in the page."}
+
+        # Load JSON data
+        try:
+            apollo_state = json.loads(script_tag.string)
+            # print("Apollo state successfully loaded.")
+            # print("Apollo state:", apollo_state)
+        except json.JSONDecodeError as e:
+            # print(f"Failed to decode JSON: {e}")
+            return {"error": "Failed to decode JSON."}
+
+        # Extract jobs from the Apollo state
+        jobs = []
+
+        # Loop over the "apolloState" and look for highlightedJobListings
+        apollo_data = apollo_state.get("props", {}).get("pageProps", {}).get("apolloState", {})
+        if not apollo_data:
+            # print("No apolloState found in the parsed Apollo state.")
+            return {"error": "No apolloState found in the parsed data."}
+        
+        # print(f"Apollo state contains {len(apollo_data)} entries.")
+        # print("Apollo state keys:", apollo_data.keys()) 
+
+        for key, value in apollo_data.items():
+            # print(f"Key: {key}, Value: {value}")
+            if key.startswith("JobListingSearchResult:"):
+                job_details = value
+
+                # Create the job dictionary with the relevant details
+                job = {
+                    "title": job_details.get("title", ""),
+                    "company": job_details.get("company", {}).get("name", ""),
+                    "description": job_details.get("description", ""),
+                    "location": job_details.get("locationNames", [])[0] if job_details.get("locationNames") else "",
+                    "url": f"https://wellfound.com/job/{job_details.get('slug', '')}",
+                    "jobType": job_details.get("jobType", ""),
+                    "compensation": job_details.get("compensation", ""),
+                    "yearsExperienceMin": job_details.get("yearsExperienceMin", ""),
+                    "yearsExperienceMax": job_details.get("yearsExperienceMax", ""),
+                    "primaryRoleTitle": job_details.get("primaryRoleTitle", ""),
+                    "remote": job_details.get("remote", False),
+                    "slug": job_details.get("slug", ""),
+                    "id": job_details.get("id", ""),
+                    "isBookmarked": job_details.get("isBookmarked", False),
+                    "companySize": job_details.get("companySize", ""),
+                    "highConcept": job_details.get("highConcept", ""),
+                    "logoUrl": job_details.get("logoUrl", ""),
+                }
+                jobs.append(job)
+                print(f"Job found: {job}")
+
+        if not jobs:
+            # print("No jobs found in Apollo state.")
+            return {"error": "No jobs found in Apollo state."}
+
+        return jobs
     except Exception as e:
-        print(f"Error generating embedding: {e}")
-        return None
+        # print(f"Failed to extract jobs: {str(e)}")
+        return {"error": f"Failed to extract jobs: {str(e)}"}
+
+def scrape_jobs(role="", location=""):
+    if role and location:
+        url = f"https://wellfound.com/role/l/{role}/{location}"
+    elif role:
+        url = f"https://wellfound.com/role/{role}"
+    elif location:
+        url = f"https://wellfound.com/location/{location}"
+    else:
+        raise ValueError("Either role or location must be provided.")
+    
+    try:
+        result = client.scrape(ScrapeConfig(url=url, asp=True))
+        job_data = extract_apollo_state(result)
+        return job_data
+    except Exception as e:
+        return {"error": f"Scraping failed: {str(e)}"}
+
+def match_jobs_with_resume(resume_content, role="python-developer", location="san-francisco"):
+    try:
+        # Scrape jobs
+        jobs = scrape_jobs(role, location)
+        if "error" in jobs:
+            return jobs
+
+        # Embed the resume
+        resume_embedding = model.encode(resume_content)
+
+        # Embed job descriptions and find matches
+        job_matches = []
+        for job in jobs:
+            job_description = job.get("description", "")
+            job_embedding = model.encode(job_description)
+
+            # Compute similarity
+            similarity = util.cos_sim(resume_embedding, job_embedding).item()
+            job["similarity"] = similarity
+            job_matches.append(job)
+
+        # Sort by similarity score
+        job_matches.sort(key=lambda x: x["similarity"], reverse=True)
+
+        return job_matches[:10]
+    except Exception as e:
+        return {"error": f"Matching failed: {str(e)}"}
+

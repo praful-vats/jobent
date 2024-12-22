@@ -7,7 +7,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Resume
 from .serializers import ResumeSerializer
 from users.models import UserProfile
-from backend.resume.services.resume_modifier import rewrite_resume
+from resume.services.groq_api import rewrite_resume
+from resume.services.groq_api import generate_cover_letter
 from io import BytesIO
 from reportlab.lib.pagesizes import letter # type: ignore
 from reportlab.pdfgen import canvas # type: ignore
@@ -21,7 +22,9 @@ from django.conf import settings
 from reportlab.lib.pagesizes import letter # type: ignore
 from reportlab.pdfgen import canvas # type: ignore
 from django.urls import reverse
-from resume.services.job_matching import match_jobs
+# from resume.services.job_matching import match_jobs
+# from resume.services.companies import Companies
+
 
 logger = logging.getLogger(__name__)
 
@@ -145,6 +148,88 @@ def extract_layout_from_pdf(pdf_file_path):
     return layout
 
 
+# class ResumeRewriteView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def put(self, request, *args, **kwargs):
+#         user = request.user
+
+#         # Fetch the user's latest resume
+#         try:
+#             resume = Resume.objects.get(user=user, is_latest=True)
+#         except Resume.DoesNotExist:
+#             return Response(
+#                 {"error": "No latest resume found for the user."},
+#                 status=status.HTTP_404_NOT_FOUND
+#             )
+
+#         # Get the job description from the request
+#         job_description = request.data.get("job_description")
+#         if not job_description:
+#             return Response(
+#                 {"error": "Job description is required."},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+
+#         # Extract text content from the resume
+#         file_content = None
+#         if resume.file.name.endswith(".pdf"):
+#             file_content = extract_text_from_pdf(resume.file.path)
+#         else:
+#             try:
+#                 file_content = resume.file.read().decode("utf-8", errors="replace")
+#             except Exception as e:
+#                 return Response(
+#                     {"error": f"Failed to read resume file: {str(e)}"},
+#                     status=status.HTTP_400_BAD_REQUEST,
+#                 )
+
+#         if not file_content:
+#             return Response(
+#                 {"error": "Failed to extract text from the resume."},
+#                 status=status.HTTP_400_BAD_REQUEST,
+#             )
+
+#         # Call the resume rewriting service
+#         rewritten_resume = rewrite_resume(file_content, job_description)
+
+#         if not rewritten_resume:
+#             return Response(
+#                 {"error": "Failed to rewrite resume."},
+#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             )
+
+#         # Deduct one token for premium users
+#         user_profile = UserProfile.objects.get(user=user)
+#         if user_profile.user_type == "premium":
+#             user_profile.premium_tokens -= 1
+#             user_profile.save()
+
+#         # Generate a new PDF with the rewritten resume
+#         output_pdf_path = os.path.join(settings.MEDIA_ROOT, 'resumes', f"rewritten_resume_{resume.id}.pdf")
+#         self.create_rewritten_pdf(output_pdf_path, rewritten_resume)
+
+#         file_url = reverse('resume:download', kwargs={'file_name': f"rewritten_resume_{resume.id}.pdf"})
+
+#         return Response({
+#             "message": "Resume rewritten successfully",
+#             "file_url": file_url
+#         })
+
+#     def create_rewritten_pdf(self, output_path, rewritten_resume):
+#         c = canvas.Canvas(output_path, pagesize=letter)
+#         width, height = letter
+
+#         y_position = height - 50  # Start at the top of the page
+#         for line in rewritten_resume.split("\n"):
+#             if y_position < 50:  # Start a new page if near the bottom
+#                 c.showPage()
+#                 y_position = height - 50
+#             c.drawString(50, y_position, line)
+#             y_position -= 12  # Adjust line spacing
+
+#         c.save()
+
 
 class ResumeRewriteView(APIView):
     permission_classes = [IsAuthenticated]
@@ -152,31 +237,22 @@ class ResumeRewriteView(APIView):
     def put(self, request, *args, **kwargs):
         user = request.user
 
-        # Fetch the user's profile
-        try:
-            profile = UserProfile.objects.get(user=user)
-        except UserProfile.DoesNotExist:
-            return Response(
-                {"error": "User profile not found."}, status=status.HTTP_404_NOT_FOUND
-            )
-
-        # Fetch the latest resume instance (marked as is_latest=True)
+        # Fetch the user's latest resume
         try:
             resume = Resume.objects.get(user=user, is_latest=True)
         except Resume.DoesNotExist:
             return Response(
-                {"error": "No latest resume found for the user."}, status=status.HTTP_404_NOT_FOUND
+                {"error": "No latest resume found for the user."},
+                status=status.HTTP_404_NOT_FOUND
             )
 
+        # Get the job description from the request
         job_description = request.data.get("job_description")
-
         if not job_description:
             return Response(
-                {"error": "Job description is required."}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "Job description is required."},
+                status=status.HTTP_400_BAD_REQUEST
             )
-
-        # Extract layout from the original PDF
-        layout = extract_layout_from_pdf(resume.file.path)
 
         # Extract text content from the resume
         file_content = None
@@ -197,63 +273,59 @@ class ResumeRewriteView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Call the Groq API to rewrite the resume
+        # Call the resume rewriting service
         rewritten_resume = rewrite_resume(file_content, job_description)
-
         if not rewritten_resume:
             return Response(
-                {"error": "Failed to rewrite resume."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"error": "Failed to rewrite resume."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        # Deduct one token if the user is premium
-        if profile.user_type == "premium":
-            profile.premium_tokens -= 1
-            profile.save()
+        # Call the cover letter generation service
+        cover_letter = generate_cover_letter(rewritten_resume, job_description)
+        if not cover_letter:
+            return Response(
+                {"error": "Failed to generate cover letter."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
-        # Generate the rewritten resume as a PDF with the same layout
-        # Define the output path using the user's latest resume's id
-        output_pdf_dir = os.path.join(settings.MEDIA_ROOT, 'resumes')
-        os.makedirs(output_pdf_dir, exist_ok=True)  # Ensure the directory exists
+        # Deduct one token for premium users
+        user_profile = UserProfile.objects.get(user=user)
+        if user_profile.user_type == "premium":
+            user_profile.premium_tokens -= 1
+            user_profile.save()
 
-        output_pdf_path = os.path.join(output_pdf_dir, f"rewritten_resume_{resume.id}.pdf")
+        # Generate PDFs for the rewritten resume and cover letter
+        resume_pdf_path = os.path.join(settings.MEDIA_ROOT, 'resumes', f"rewritten_resume_{resume.id}.pdf")
+        cover_letter_pdf_path = os.path.join(settings.MEDIA_ROOT, 'resumes', f"cover_letter_{resume.id}.pdf")
+        self.create_pdf(resume_pdf_path, rewritten_resume)
+        self.create_pdf(cover_letter_pdf_path, cover_letter)
 
-        # Generate the PDF with the rewritten content
-        self.create_rewritten_pdf(output_pdf_path, rewritten_resume, layout)
+        resume_file_url = reverse('resume:download', kwargs={'file_name': f"rewritten_resume_{resume.id}.pdf"})
+        cover_letter_file_url = reverse('resume:download', kwargs={'file_name': f"cover_letter_{resume.id}.pdf"})
 
-        file_url = reverse('resume:download', kwargs={'file_name': f"rewritten_resume_{resume.id}.pdf"})
-
-        # Return the new PDF file as a response
         return Response({
-            'message': 'Resume rewritten successfully',
-            'file_url': file_url
+            "message": "Resume and cover letter generated successfully",
+            "resume_file_url": resume_file_url,
+            "cover_letter_file_url": cover_letter_file_url
         })
 
-    def create_rewritten_pdf(self, output_path, rewritten_resume, original_layout):
+    def create_pdf(self, output_path, content):
         c = canvas.Canvas(output_path, pagesize=letter)
         width, height = letter
 
-        y_position = height - 50  # Start position (from top of the page)
-
-        # Ensure rewritten_resume is a string before splitting it into lines
-        if isinstance(rewritten_resume, tuple):
-            rewritten_resume = rewritten_resume[0]  # Extract the actual resume content if it's a tuple
-
-        rewritten_lines = rewritten_resume.split("\n")  # Now we can safely split
-
-        # Add text with original layout info
-        def add_text(text, y_position, font="Helvetica", font_size=10):
-            c.setFont(font, font_size)
-            c.drawString(50, y_position, text)
-            return y_position - font_size - 2  # Adjust the y position after adding text
-
-        for line in rewritten_lines:
-            # You can adjust this logic to more closely match the original layout
-            y_position = add_text(line, y_position)
-            if y_position < 50:
+        y_position = height - 50  # Start at the top of the page
+        for line in content.split("\n"):
+            if y_position < 50:  # Start a new page if near the bottom
                 c.showPage()
                 y_position = height - 50
+            c.drawString(50, y_position, line)
+            y_position -= 12  # Adjust line spacing
 
         c.save()
+
+
+
 
 def download_resume(request, file_name):
     file_path = os.path.join(settings.MEDIA_ROOT, 'resumes', file_name)
@@ -261,124 +333,74 @@ def download_resume(request, file_name):
         return FileResponse(open(file_path, 'rb'), content_type='application/pdf', as_attachment=True)
     else:
         return Response({"error": "File not found"}, status=status.HTTP_404_NOT_FOUND)
-    
-
-# class JobMatchingView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request):
-#         user = request.user
-#         try:
-#             resume = Resume.objects.get(user=user, is_latest=True)
-#         except Resume.DoesNotExist:
-#             return Response({"error": "No resume found for the user."}, status=status.HTTP_404_NOT_FOUND)
-
-#         resume_content = resume.content
-#         matched_jobs = match_jobs(resume_content)
-#         return Response(matched_jobs, status=status.HTTP_200_OK)
-
-#     def post(self, request):
-#         return self.get(request)
 
 
 # class JobMatchingView(APIView):
-#     permission_classes = [IsAuthenticated]
+#     # permission_classes = [IsAuthenticated]
 
 #     def get(self, request):
 #         user = request.user
-#         print(f"User {user.id} is requesting job matching.")
-
-#         try:
-#             # Attempt to fetch the latest resume for the user
-#             resume = Resume.objects.get(user=user, is_latest=True)
-#             print(f"Found latest resume for user {user.id}.")
-#         except Resume.DoesNotExist:
-#             # If no resume is found for the user
-#             print(f"Error: No resume found for user {user.id}.")
-#             return Response({"error": "No resume found for the user."}, status=status.HTTP_404_NOT_FOUND)
-
-#         # If resume is found, log the resume content retrieval
-#         resume_content = resume.content
-#         print(f"Resume content retrieved for user {user.id}, proceeding to match jobs.")
-
-#         # Perform the job matching
+#         resume = Resume.objects.get(user=user, is_latest=True)
+#         resume_content = extract_text_from_pdf(resume.file.path)
 #         matched_jobs = match_jobs(resume_content)
-#         print(f"Job matching completed for user {user.id}, {len(matched_jobs)} jobs found.")
-
-#         # Return the matched jobs
 #         return Response(matched_jobs, status=status.HTTP_200_OK)
 
+
+# class JobMatchingView(APIView):
+#     # permission_classes = [IsAuthenticated]
+
 #     def post(self, request):
-#         print("POST request received, forwarding to GET method.")
-#         return self.get(request)
+#         user = request.user
 
-# from django.http import JsonResponse
-# from resume.services.companies import match_jobs_with_resume
-# from django.views.decorators.csrf import csrf_exempt
+#         # For testing, we use a sample resume content instead of extracting from a PDF
+#         resume_content = """
+#         Highly motivated and detail-oriented software engineer with experience in developing web applications, 
+#         and a strong background in Python, Django, and React. Looking for opportunities to leverage expertise 
+#         in full-stack development to contribute to innovative tech teams.
+#         """
 
-# @csrf_exempt
-# def JobMatchingView(request):
-#     if request.method == "POST":
-#         resume_content = request.POST.get("resume_content", "")
-#         if not resume_content:
-#             return JsonResponse({"error": "Resume content is required"}, status=400)
+#         # Step 3: Initialize the Companies object to handle job scraping and matching
+#         companies = Companies()
 
-#         matched_jobs = match_jobs_with_resume(resume_content)
-#         return JsonResponse({"matched_jobs": matched_jobs}, status=200)
+#         # Step 4: Match jobs with the resume content
+#         matched_jobs = companies.match_jobs_with_resume(resume_content)
 
-#     return JsonResponse({"error": "Invalid request method"}, status=405)
+#         # Step 5: Handle possible errors from the job matching process
+#         if "error" in matched_jobs:
+#             return Response(matched_jobs, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#         # Step 6: Return the top matching jobs to the user
+#         return Response(matched_jobs, status=status.HTTP_200_OK)
 
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from resume.services.companies import match_jobs_with_resume
-from resume.models import Resume
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from resume.services.job_matching import match_jobs_with_resume
 
-from resume.services.pdf_processor import extract_resume_from_pdf
-@csrf_exempt
-def modify_resume(request):
-    """
-    Endpoint to modify resume based on job description.
-    """
-    if request.method == 'POST':
+
+class JobMatchingView(APIView):
+    # permission_classes = [IsAuthenticated]
+    def post(self, request):
+        user = request.user
         try:
-            resume_file = request.FILES['resume']  # Resume file uploaded by user
-            job_description = request.POST['job_description']
+            resume = Resume.objects.get(user=user, is_latest=True)
+        except Resume.DoesNotExist:
+            return Response({"error": "No latest resume found."}, status=status.HTTP_404_NOT_FOUND)
 
-            # Extract resume content from PDF
-            resume_content = extract_resume_from_pdf(resume_file)
+        # Step 2: Extract text from the resume (assuming it's a PDF)
+        resume_content = """Highly motivated and detail-oriented software engineer with experience in developing web applications, 
+        and a strong background in Python, Django, and React. Looking for opportunities to leverage expertise 
+        in full-stack development to contribute to innovative tech teams."""
 
-            # Rewrite resume according to job description
-            original_resume = {
-                'summary': 'Extracted Summary',
-                'skills': 'Extracted Skills',
-                'experience': 'Extracted Experience',
-                'education': 'Extracted Education',
-                'projects': 'Extracted Projects'
-            }
-            rewritten_resume = rewrite_resume(original_resume, job_description)
+        # Match jobs with the resume
+        matched_jobs = match_jobs_with_resume(resume_content)
+        print("Matched jobs:", matched_jobs)
 
-            return JsonResponse({'rewritten_resume': rewritten_resume})
+        if "error" in matched_jobs:
+            return Response(matched_jobs, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        except Exception as e:
-            return JsonResponse({'error': f"An error occurred: {str(e)}"}, status=500)
+        if not matched_jobs:
+            return Response({"message": "No jobs matched your resume."}, status=status.HTTP_200_OK)
 
-@csrf_exempt
-def match_jobs_view(request):
-    """
-    Endpoint to match jobs based on resume content.
-    """
-    if request.method == 'POST':
-        try:
-            resume_file = request.FILES['resume']  # Resume file uploaded by user
-
-            # Extract resume content from PDF
-            resume_content = extract_resume_from_pdf(resume_file)
-
-            # Match jobs with the extracted resume content
-            matched_jobs = match_jobs(resume_content)
-
-            return JsonResponse({'matched_jobs': matched_jobs})
-
-        except Exception as e:
-            return JsonResponse({'error': f"An error occurred: {str(e)}"}, status=500)
+        return Response(matched_jobs, status=status.HTTP_200_OK)
