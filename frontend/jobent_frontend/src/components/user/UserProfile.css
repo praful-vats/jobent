@@ -1,0 +1,53 @@
+.profile {
+    font-family: monospace;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    color: #ffffff;
+    margin-top: 10%;
+  }
+  
+  .profile-header {
+    border-bottom: 1px solid #000;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+  }
+  
+  .profile-details h1 {
+    font-size: 24px;
+    font-weight: normal;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+  
+  .profile-content {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  .profile-content p {
+    display: flex;
+    margin: 10px 0;
+    border-bottom: 1px solid #ffffff;
+    padding: 5px 0;
+  }
+  
+  .profile-content strong {
+    width: 150px;
+    font-weight: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .loading, .error, .no-profile {
+    text-align: center;
+    font-family: monospace;
+    padding: 20px;
+    color: #666;
+  }
+  
+  /* Utility classes */
+  .error {
+    color: #ff0000;
+  }
+  

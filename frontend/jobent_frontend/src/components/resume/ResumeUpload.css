@@ -1,0 +1,124 @@
+.upload-resume-container {
+    font-family: 'Arial', sans-serif;
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #f9f9f900;
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: 1fr; 
+    grid-gap: 20px;
+}
+
+/* Heading style for Upload Resume */
+.upload-resume-heading {
+    font-size: 2rem;
+    color: #000000;
+    text-align: center;
+    /* margin-bottom: 10px; */
+}
+
+/* Form styles */
+.upload-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 15px;
+    justify-items: center;
+}
+
+/* Input field for file selection */
+.file-input {
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Submit button style */
+.submit-button {
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    color: white;
+    background-color: #000000;
+    border: 1px solid rgb(0, 0, 0);
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 400px;
+    transition: background-color 0.6s;
+}
+
+.submit-button:hover {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* Message display style */
+.message {
+    color: #ff0000;
+    text-align: center;
+    font-size: 1.1rem;
+    margin-top: 10px;
+}
+
+/* Container for the PDF preview */
+.pdf-preview-container {
+    grid-column: span 1; /* Make the preview take full width */
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Heading for PDF Preview section */
+.pdf-preview-heading {
+    font-size: 1.5rem;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+/* Style for the embedded PDF preview */
+.pdf-preview {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    max-width: 100%;
+    margin-top: -100px;
+    height: auto;
+}
+
+/* Optional: Add responsive styles */
+@media (min-width: 768px) {
+    .upload-resume-container {
+        grid-template-columns: repeat(2, 1fr); /* Two columns layout for larger screens */
+        grid-gap: 30px;
+    }
+
+    .upload-form {
+        grid-template-columns: 1fr; /* Keep form in single column */
+        justify-items: start;
+    }
+
+    .file-input, .submit-button {
+        max-width: 100%;
+    }
+
+    .pdf-preview {
+        max-width: 100%;
+        height: 400px; /* Adjust height for larger screens */
+    }
+}
+
+@media (max-width: 600px) {
+    .upload-resume-container {
+        padding: 15px;
+    }
+
+    .file-input, .submit-button {
+        max-width: 100%;
+    }
+
+    .pdf-preview {
+        width: 100%;
+        height: 300px;
+    }
+}

@@ -67,7 +67,7 @@ const SignupPage = () => {
     firstName: '',
     lastName: '',
     email: '',
-    birthday: '',
+    // birthday: '',
     gender: '',
     username: '',
     password: '',
@@ -97,7 +97,7 @@ const SignupPage = () => {
         password: formData.password,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        birthday: formData.birthday,
+        // birthday: formData.birthday,
       });
       localStorage.setItem('token', response.data.token);
       navigate('/service');
@@ -140,7 +140,7 @@ const SignupPage = () => {
           required
           />
           
-          <div className="birth-gender-group">
+          {/* <div className="birth-gender-group">
           <input
               type="date"
               name="birthday"
@@ -150,7 +150,7 @@ const SignupPage = () => {
               // required
           />
           
-          </div>
+          </div> */}
           
           <input
           type="password"

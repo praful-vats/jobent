@@ -4,22 +4,45 @@ import axios from 'axios';
 const JobSearch = ({ onJobSearchResults }) => {
   const [matchedJobs, setMatchedJobs] = useState([]);
 
+  // const handleJobSearch = async () => {
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     const response = await axios.post('http://localhost:8000/resume/match-jobs/', {}, {
+  //       headers: {
+  //         'Authorization': `Token ${token}`,
+  //       },
+  //     });
+  //     setMatchedJobs(response.data.matched_jobs);
+  //     if (onJobSearchResults) {
+  //       onJobSearchResults(response.data.matched_jobs); // Pass results up
+  //     }
+  //   } catch (error) {
+  //     console.error('Error searching for jobs:', error);
+  //   }
+  // };
+
   const handleJobSearch = async () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post('http://localhost:8000/resume/match-jobs/', {}, {
-        headers: {
-          'Authorization': `Token ${token}`,
-        },
+        headers: { 'Authorization': `Token ${token}` },
       });
-      setMatchedJobs(response.data.matched_jobs);
-      if (onJobSearchResults) {
-        onJobSearchResults(response.data.matched_jobs); // Pass results up
+  
+      if (response.data.error) {
+        console.error('Error from backend:', response.data.error);
+        setMatchedJobs([]);
+      } else {
+        setMatchedJobs(response.data.matched_jobs || []);
+        if (onJobSearchResults) {
+          onJobSearchResults(response.data.matched_jobs || []);
+        }
       }
     } catch (error) {
       console.error('Error searching for jobs:', error);
+      setMatchedJobs([]);
     }
   };
+  
 
   return (
     <div>

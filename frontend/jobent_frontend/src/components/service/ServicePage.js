@@ -134,7 +134,10 @@ import { InlineWidget } from "react-calendly";
 import ResumeUpload from '../resume/ResumeUpload';
 import ResumeList from '../resume/ResumeList';
 import JobSearch from '../job_search/JobSearch';
+import Chatbot from '../bot/Chatbot';
+import RecentConversation from '../bot_history/RecentConversation';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const ServicePage = () => {
   const [activePopup, setActivePopup] = useState(null);
@@ -183,17 +186,28 @@ const ServicePage = () => {
     }
   }, [activePopup]);
 
+  const navigate = useNavigate();
+
+  const handleRedirect = () => {
+    navigate('/profile');
+  };
+
+  const handleRedirectToHomepage = () => {
+    navigate('/');  // Redirect to the homepage
+  };
+
+
   return (
     <div className="service-page">
       <main>
         <div className="grid3">
-          <div className="card3">
+          <div onClick={handleRedirectToHomepage} className="card3">
             <p>ƃ:</p>
           </div>
           <div className="card5"> 
-            <p>✺</p>
+            <p>✺ premium</p>
           </div>
-          <div className="card4"> 
+          <div onClick={handleRedirect} className="card4"> 
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
               <circle cx="12" cy="8" r="4" />
               <path d="M12 14c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z" />
@@ -225,7 +239,7 @@ const ServicePage = () => {
               <p className="card-body-text">Generate customized resume and cover letters by analyzing the resume, job description, company website, and other public information.</p>
             </div>
           </div>
-          <div className="card" onClick={() => setActivePopup('search')}>
+          <div className="card" onClick={() => setActivePopup('Chatbot')}>
             <div className="card-header">
               <p className="card-header1">BOT</p>
               <svg className="card-header2" fill="none" height="44" viewBox="0 0 24 24" width="44" xmlns="http://www.w3.org/2000/svg">
@@ -239,19 +253,19 @@ const ServicePage = () => {
           </div>
           <div className="card" onClick={() => setActivePopup('search')}>
             <div className="card-header">
-              <p className="card-header1">DATA</p>
+              <p className="card-header1">CONNECT</p>
               <svg className="card-header2" fill="none" height="44" viewBox="0 0 24 24" width="44" xmlns="http://www.w3.org/2000/svg">
                 <path d="m18.5 15.5 3.5-3.5-3.5-3.5-.707.707 2.293 2.293h-18.086v1h18.086l-2.293 2.293z" fill="#000"/>
               </svg>
             </div>
             <div className="card-body">
-              <p className="card-body-icon">░</p>
+              <p className="card-body-icond">░</p>
               <p className="card-body-text">Comprehensive summary of your career data, to track seamless job matching and ensure alignment with the most relevant opportunities.</p>
             </div>
           </div>
         </div>
         <div className="grid2">
-          <div className="card2" onClick={() => setActivePopup('search')}>
+          <div className="card2" onClick={() => setActivePopup('RecentConversation')}>
             <div className="card-header">
               <p className='card-header1'>CONVERSATION</p>
               <svg className='card-header2' fill="none" height="44" viewBox="0 0 24 24" width="44" xmlns="http://www.w3.org/2000/svg"><path d="m18.5 15.5 3.5-3.5-3.5-3.5-.707.707 2.293 2.293h-18.086v1h18.086l-2.293 2.293z" fill="#000"/></svg>
@@ -276,38 +290,17 @@ const ServicePage = () => {
         </div>
       </main>
 
-      {/* Conditional rendering for popups */}
-      {/* {activePopup === 'upload' && (
-        <div className="popup">
-          <div className="popup-content">
-            <button className="close-button" onClick={closePopup}>X</button>
-            <ResumeUpload onUploadSuccess={() => { 
-                fetchRecentResumes(); 
-                handleJobSearch(); 
-            }} />
-
-
-            <h3>Recent Resumes</h3>
-            <ul>
-              {recentResumes.map((resume) => (
-                <li key={resume.id}>{resume.file_name}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )} */}
-
         {activePopup === 'upload' && (
           <div className="popup">
             <div className="popup-content">
-              <button className="close-button" onClick={closePopup}>X</button>
+              <button className="close-button" onClick={closePopup}>⛒</button>
               <ResumeUpload
                 onUploadSuccess={(newResume) => {
                   fetchRecentResumes();
                   setSelectedResumeId(newResume.id); 
                 }}
               />
-              <h3>Select a Recent Resume</h3>
+              {/* <h3>Select a Recent Resume</h3>
               <ul>
                 {recentResumes.map((resume) => (
                   <li key={resume.id}>
@@ -324,7 +317,7 @@ const ServicePage = () => {
               </ul>
               <button onClick={handleJobSearch} disabled={!selectedResumeId}>
                 Find Matching Jobs
-              </button>
+              </button> */}
             </div>
           </div>
         )}
@@ -348,7 +341,7 @@ const ServicePage = () => {
       {activePopup === 'list' && (
         <div className="popup">
           <div className="popup-content">
-            <button className="close-button" onClick={closePopup}>X</button>
+            <button className="close-button" onClick={closePopup}>⛒</button>
             <ResumeList />
           </div>
         </div>
@@ -357,7 +350,7 @@ const ServicePage = () => {
       {activePopup === 'search' && (
         <div className="popup">
           <div className="popup-content">
-            <button className="close-button" onClick={closePopup}>X</button>
+            <button className="close-button" onClick={closePopup}>⛒</button>
             <JobSearch onJobSearchResults={(results) => setJobSearchResults(results)} />
           </div>
         </div>
@@ -366,8 +359,36 @@ const ServicePage = () => {
       {activePopup === 'calender' && (
         <div className="popup">
           <div className="popup-content">
-            <button className="close-button" onClick={closePopup}>X</button>
-            <InlineWidget url="https://calendly.com/dodooed-13/30min" />
+            <button className="close-button" onClick={closePopup}>⛒</button>
+            {/* <InlineWidget url="https://calendly.com/dodooed-13/30min" /> */}
+            <div style={{ width: '600px', height: '600px' }}>
+              <InlineWidget
+                url="https://calendly.com/dodooed-13/30min"
+                styles={{
+                  height: '85%',
+                  width: '90%',
+                  marginLeft: '35%',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activePopup === 'Chatbot' && (
+        <div className="popup">
+          <div className="popup-content">
+            <button className="close-button" onClick={closePopup}>⛒</button>
+            <Chatbot />
+          </div>
+        </div>
+      )}
+
+      {activePopup === 'RecentConversation' && (
+        <div className="popup">
+          <div className="popup-content">
+            <button className="close-button" onClick={closePopup}>⛒</button>
+            <RecentConversation />
           </div>
         </div>
       )}

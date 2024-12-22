@@ -147,6 +147,7 @@ REST_FRAMEWORK = {
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
+    'rest_framework.authentication.TokenAuthentication',
 ]
 
 
@@ -172,3 +173,25 @@ PINECONE_API_KEY = 'pcsk_qNsFT_HBcHa6jEqRq1YUzLbmSgNoZV8AfyrHmkK5dbKY9kXVLMtRQJC
 PINECONE_INDEX_NAME = 'jobent'
 GROQ_API_KEY = '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'
 PINECONE_ENVIRONMENT = 'us-east-1'
+
+# settings.py
+
+# Allow cookies for local development (same-site=None, secure=False)
+SESSION_COOKIE_SAMESITE = 'None'  # Allows cross-site cookies
+SESSION_COOKIE_SECURE = False     # Disable Secure flag for local development (use HTTPS for production)
+CSRF_COOKIE_SAMESITE = 'None'    # Same for CSRF cookie
+CSRF_COOKIE_SECURE = False       # Disable Secure flag for CSRF cookies in local dev
+
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
+}
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.file'
