@@ -106,7 +106,9 @@ const ResumeList = () => {
   const fetchResumes = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8000/resume/api/resumes/', {
+      // const response = await axios.get('http://localhost:8000/resume/api/resumes/', {
+      const BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
+      const response = await axios.get(`${BASE_URL}/resume/api/resumes/`, {
         headers: {
           'Authorization': `Token ${token}`,
         },
@@ -120,8 +122,9 @@ const ResumeList = () => {
   const handleRewrite = async (resumeId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.put(
-        `http://localhost:8000/resume/rewrite/${resumeId}/`,
+      const BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
+      const response = await axios.put
+        (`${BASE_URL}/resume/rewrite/${resumeId}/`,
         {
           job_description: jobDescription,
         },

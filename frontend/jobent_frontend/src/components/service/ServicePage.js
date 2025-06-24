@@ -136,12 +136,13 @@ import ResumeList from '../resume/ResumeList';
 import JobSearch from '../job_search/JobSearch';
 import Chatbot from '../bot/Chatbot';
 import RecentConversation from '../bot_history/RecentConversation';
+import Carousel from '../carousel/Carousel';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const ServicePage = () => {
   const [activePopup, setActivePopup] = useState(null);
-  const [recentResumes, setRecentResumes] = useState([]);
+  const [, setRecentResumes] = useState([]);
   const [selectedResumeId, setSelectedResumeId] = useState(null);
   const [jobSearchResults, setJobSearchResults] = useState([]);
 
@@ -152,7 +153,9 @@ const ServicePage = () => {
   const fetchRecentResumes = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8000/resume/api/resumes/', {
+      // const response = await axios.get('http://localhost:8000/resume/api/resumes/', {
+      const BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
+      const response = await axios.get(`${BASE_URL}/resume/api/resumes/`, {}, {
         headers: {
           'Authorization': `Token ${token}`,
         },
@@ -167,7 +170,8 @@ const ServicePage = () => {
     console.log("Triggering job search...");
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:8000/resume/match-jobs/', { resume_id: selectedResumeId }, {
+      const BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
+      const response = await axios.post(`${BASE_URL}/resume/match-jobs/`, { resume_id: selectedResumeId }, {
         headers: {
           'Authorization': `Token ${token}`,
         },
@@ -195,6 +199,7 @@ const ServicePage = () => {
   const handleRedirectToHomepage = () => {
     navigate('/');  // Redirect to the homepage
   };
+  
 
 
   return (
@@ -205,7 +210,10 @@ const ServicePage = () => {
             <p>ƃ:</p>
           </div>
           <div className="card5"> 
-            <p>✺ premium</p>
+            <a href="/premium" className="no-decoration">
+              <span className="ic">✺</span>
+              <span className="pt"> premium</span>
+            </a>
           </div>
           <div onClick={handleRedirect} className="card4"> 
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
@@ -213,6 +221,9 @@ const ServicePage = () => {
               <path d="M12 14c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z" />
             </svg>
           </div>
+        </div>
+        <div className='gridc'>
+          <Carousel />
         </div>
         <div className="grid">
           <div className="card" onClick={() => setActivePopup('upload')}>
@@ -272,7 +283,7 @@ const ServicePage = () => {
             </div>
             <div className="card-body">
               <p className='card-body-icon'>𓁨</p>
-              <p className='card-body-text'>generate customized resume and cover letters by analyzing the resume, job description, company website, and other public information.</p>
+              <p className='card-body-text'>Access a history of your past interactions with the system, allowing you to review customized resumes, cover letters, career advice, and interview preparation notes anytime.</p>
             </div>
           </div>
           <div className="card2" onClick={() => setActivePopup('calender')}>
@@ -284,7 +295,7 @@ const ServicePage = () => {
             </div>
             <div className="card-body">
               <p className="card-body-icon">𓎎</p>
-              <p className="card-body-text">Generate customized resume and cover letters by analyzing the resume, job description, company website, and other public information.</p>
+              <p className="card-body-text">Seamlessly schedule interviews, track deadlines, and manage follow-ups with an integrated calendar designed to keep you on top of your job search.</p>
             </div>
           </div>
         </div>
@@ -314,10 +325,10 @@ const ServicePage = () => {
                     <label htmlFor={`resume-${resume.id}`}>{resume.file_name}</label>
                   </li>
                 ))}
-              </ul>
+              </ul>*/}
               <button onClick={handleJobSearch} disabled={!selectedResumeId}>
-                Find Matching Jobs
-              </button> */}
+                
+              </button>
             </div>
           </div>
         )}

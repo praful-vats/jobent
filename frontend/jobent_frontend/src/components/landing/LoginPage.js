@@ -22,7 +22,9 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/login/', {
+      // const response = await axios.post('http://localhost:8000/api/login/', {
+      const BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
+      const response = await axios.post(`${BASE_URL}/api/login/`, {
         email: formData.email, // Fix: Use 'email' instead of 'username'
         password: formData.password,
       });

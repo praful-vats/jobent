@@ -92,7 +92,10 @@ const SignupPage = () => {
       return;
     }
     try {
-      const response = await axios.post('http://localhost:8000/api/signup/', {
+      // const response = await axios.post('http://localhost:8000/api/signup/', {
+      const BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
+      console.log(BASE_URL);
+      const response = await axios.post(`${BASE_URL}/api/signup/`, {
         email: formData.email,
         password: formData.password,
         firstName: formData.firstName,

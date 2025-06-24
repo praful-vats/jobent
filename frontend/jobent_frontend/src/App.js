@@ -8,6 +8,7 @@ import ResumeList from "./components/resume/ResumeList";
 import ServicePage from "./components/service/ServicePage";
 import JobSearch from "./components/job_search/JobSearch";
 import UserProfile from "./components/user/UserProfile"; 
+import Premium from "./components/premium/Premium";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/service/resume/list" element={<ResumeList />} />
         <Route path="/service/job/search" element={<JobSearch />} />
         <Route path="/profile" element={<UserProfile />} />
+        <Route path="/premium" element={<Premium />} />
         {/* Add other routes here */}
       </Routes>
     </Router>

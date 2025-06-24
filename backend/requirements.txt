@@ -1,0 +1,14 @@
+Django==4.2.3
+# fitz==0.0.1.dev2
+groq==0.13.1
+pinecone
+PyPDF2==3.0.1
+reportlab==4.2.5
+Requests==2.32.3
+sentence_transformers==3.3.1
+djangorestframework==3.14.0
+django-cors-headers==4.6.0
+PyMuPDF==1.25.2
+scrapfly-sdk
+mysqlclient
+gunicorn

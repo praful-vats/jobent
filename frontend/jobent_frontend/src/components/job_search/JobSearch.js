@@ -24,9 +24,15 @@ const JobSearch = ({ onJobSearchResults }) => {
   const handleJobSearch = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:8000/resume/match-jobs/', {}, {
-        headers: { 'Authorization': `Token ${token}` },
+      // const response = await axios.post('http://localhost:8000/resume/match-jobs/', {}, {
+      //   headers: { 'Authorization': `Token ${token}` },
+      // });
+
+      const BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
+      const response = await axios.post(`${BASE_URL}/resume/match-jobs/`, {}, {
+          headers: { 'Authorization': `Token ${token}` },
       });
+
   
       if (response.data.error) {
         console.error('Error from backend:', response.data.error);

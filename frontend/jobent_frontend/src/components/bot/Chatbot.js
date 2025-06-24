@@ -123,7 +123,9 @@ const Chatbot = () => {
                     return; // Optionally handle the missing token case
                 }
                 
-                const response = await fetch('http://localhost:8000/resume/chat/', {
+                // const response = await fetch('http://localhost:8000/resume/chat/', {
+                const BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
+                const response = await fetch(`${BASE_URL}/resume/chat/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -165,7 +167,9 @@ const Chatbot = () => {
             try {
                 const token = localStorage.getItem('token');
                 console.log("Token:", token);
-                const response = await fetch('http://localhost:8000/resume/chat/', {
+                // const response = await fetch('http://localhost:8000/resume/chat/', {
+                const BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
+                const response = await fetch(`${BASE_URL}/resume/chat/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

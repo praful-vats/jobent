@@ -42,7 +42,7 @@ const LandingPage = () => {
                     <div className="icon">↔</div>
                     <h2>System-driven</h2>
                     <p>
-                        Deep understanding bot provide comprehensive services to effectivly communicate and manage interviews on your behalf.
+                        Deep understanding bot provide comprehensive services to effectivly communicate and manage interviews.
                     </p>
                 </div>
 

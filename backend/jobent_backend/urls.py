@@ -22,4 +22,5 @@ urlpatterns = [
     path('api/', include('users.urls')),
     path('resume/', include(('resume.urls', 'resume'), namespace='resume')),
     path('', include('landing.urls')),
+    path('service/', include('service.urls')),
 ]

@@ -8,6 +8,8 @@
     display: grid;
     grid-template-columns: 1fr; 
     grid-gap: 20px;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Heading style for Upload Resume */
@@ -15,8 +17,10 @@
     font-size: 2rem;
     color: #000000;
     text-align: center;
-    /* margin-bottom: 10px; */
+    min-height: 50px;
+    /* margin-top: -40px; */
 }
+
 
 /* Form styles */
 .upload-form {
@@ -79,7 +83,7 @@
 
 /* Style for the embedded PDF preview */
 .pdf-preview {
-    border-radius: 8px;
+    border-radius: 10px;
     border: 1px solid #ddd;
     max-width: 100%;
     margin-top: -100px;

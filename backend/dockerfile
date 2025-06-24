@@ -1,0 +1,29 @@
+# Base image
+FROM python:3.10-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libmariadb-dev \
+    libmariadb-dev-compat \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the project files
+COPY . .
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Expose the port for the Django app
+EXPOSE 8000
+
+# Start the Django server
+CMD ["gunicorn", "jobent_backend.wsgi:application", "--bind", "0.0.0.0:8000"]

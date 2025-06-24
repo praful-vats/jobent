@@ -16,8 +16,8 @@ const UserProfile = () => {
           setLoading(false);
           return;
         }
-
-        const response = await axios.get('http://localhost:8000/api/profile/', {
+        const BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
+        const response = await axios.get(`${BASE_URL}/api/profile/`, {
           headers: {
             'Authorization': `Token ${token}`,
             'Content-Type': 'application/json',

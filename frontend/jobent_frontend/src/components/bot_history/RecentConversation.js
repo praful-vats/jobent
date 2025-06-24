@@ -66,7 +66,9 @@ const RecentConversation = () => {
                 console.log("Authorization Header:", `Token ${token}`); // Log the token for debugging
 
                 // Send the request with the token in the Authorization header
-                const response = await fetch('http://localhost:8000/resume/chat/', {
+                // const response = await fetch('http://localhost:8000/resume/chat/', {
+                const BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
+                const response = await fetch(`${BASE_URL}/resume/chat/`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Token ${token}`, // Include the token in the headers
@@ -90,7 +92,7 @@ const RecentConversation = () => {
 
     return (
         <div>
-            <h2>Recent Conversation</h2>
+            <h1>Recent Conversation</h1>
             {conversation ? (
                 <div>
                     <p><strong>Question:</strong> {conversation.question}</p>

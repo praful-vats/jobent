@@ -1,0 +1,99 @@
+.carousel-container {
+  height: 40vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  position: relative;
+  border: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+}
+
+.vertical-scroll-container {
+  display: flex;
+  flex-direction: column;
+  animation: scroll-vertical 15s linear infinite; 
+}
+
+@keyframes scroll-vertical {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.job-card {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid #ffffff;
+  background-color: #1a1a1a;
+  color: #cbcbcb;
+  white-space: nowrap;
+  overflow: hidden;
+  height: 7.75vh;
+  width: 100vw;
+  box-sizing: border-box;
+  transition: 0.3s ease-in-out;
+}
+
+.job-card:hover {
+  background-color: black;
+  color: #ffffff;
+  transition: 0.3s ease-in-out;
+}
+
+.job-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.job-title {
+  width: 23%;
+  text-align: left;
+  margin-left: 1.2rem;
+}
+
+.job-skills {
+  width: 32%;
+  margin-left: 2px;
+  text-align: left;
+}
+
+.job-location {
+  width: 20%;
+  margin-left: 10px;
+  text-align: left;
+}
+
+.job-company {
+  width: 20%;
+  text-align: left;
+}
+
+.job-score {
+  width: 1%;
+  text-align: right;
+  margin-right: 2.1rem;
+}
+
+.carousel-container::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.job {
+  font-size: 8vh;
+  transform: scaleX(-1);
+  margin-left: 1rem;
+}
